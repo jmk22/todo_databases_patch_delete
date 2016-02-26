@@ -164,5 +164,58 @@ namespace ToDoList
       }
       return foundTask;
     }
+    public void Update(string newDescription)
+    {
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("UPDATE tasks SET description = @NewDescription OUTPUT INSERTED.description WHERE id = @TaskId;", conn);
+
+      SqlParameter newDescriptionParameter = new SqlParameter();
+      newDescriptionParameter.ParameterName = "@NewDescription";
+      newDescriptionParameter.Value = newDescription;
+      cmd.Parameters.Add(newDescriptionParameter);
+
+      SqlParameter taskIdParameter = new SqlParameter();
+      taskIdParameter = new SqlParameter();
+      taskIdParameter.ParameterName = "@TaskId";
+      taskIdParameter.Value = this.GetId();
+      cmd.Parameters.Add(taskIdParameter);
+      rdr = cmd.ExecuteReader();
+
+      while(rdr.Read())
+      {
+        this._description = rdr.GetString(0);
+      }
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if(conn != null)
+      {
+        conn.Close();
+      }
+    }
+
+    public void Delete()
+    {
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("DELETE FROM tasks WHERE id = @TaskId;", conn);
+
+      SqlParameter taskIdParameter = new SqlParameter();
+      taskIdParameter.ParameterName = "@TaskId";
+      taskIdParameter.Value = this.GetId();
+
+      cmd.Parameters.Add(taskIdParameter);
+      cmd.ExecuteNonQuery();
+
+      if (conn != null)
+      {
+        conn.Close();
+      }
+    }
   }
 }

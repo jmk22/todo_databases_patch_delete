@@ -80,6 +80,42 @@ namespace ToDoList
       Assert.Equal(testTask, foundTask);
     }
 
+    [Fact]
+    public void Test_Update_UpdatesTaskInDatabase()
+    {
+      //Arrange
+      Task testTask = new Task("Walk the dog", 1);
+      testTask.Save();
+
+      //Act
+      string newDescription = "Walk the giraffe";
+      testTask.Update(newDescription);
+
+      string result = testTask.GetDescription();
+
+      //Assert
+      Assert.Equal(newDescription, result);
+    }
+
+    [Fact]
+    public void Test_Delete_DeletesTaskFromDatabase()
+    {
+      //Arrange
+      Task testTask1 = new Task("Walk the dog", 1);
+      testTask1.Save();
+
+      Task testTask2 = new Task("Mow the lawn", 1);
+      testTask2.Save();
+
+      //Act
+      testTask1.Delete();
+      List<Task> resultTasks = Task.GetAll();
+      List<Task> testTaskList = new List<Task> {testTask2};
+
+      //Assert
+      Assert.Equal(testTaskList, resultTasks);
+    }
+
     public void Dispose()
     {
       Task.DeleteAll();
